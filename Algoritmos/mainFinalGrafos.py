@@ -1,7 +1,13 @@
 import sys
 from collections import deque
 
+
+import networkx as nx
+import matplotlib.pyplot as plt
+
 import heapq
+
+
 class Grafo:
 
     ######## Construtor #############
@@ -484,6 +490,38 @@ class Grafo:
                 self._dfs_ordenacao_topologica(vizinho, visitados, empilhamento)
 
         empilhamento.append(v)
+    
+    ########################### Visualizador #######################################
+    ## Utilizamos a biblioteca python networkx para realizar a lógica de plotagem
+    ## e matplotlib pra plotar o grafo resultante
+    def visualizar_grafo(self):
+        G = nx.Graph() if not self.direcionado else nx.DiGraph()
+        
+        # Adicionar nós
+        G.add_nodes_from(range(self.vertices))
+        
+        # Adicionar arestas
+        for u in self.adjacencias:
+            for v, peso, id_aresta in self.adjacencias[u]:
+                G.add_edge(u, v, weight=peso, id=id_aresta)
+        
+        # Configurar o layout
+        pos = nx.spring_layout(G)
+        
+        # Desenhar o grafo
+        plt.figure(figsize=(12, 8))
+        nx.draw(G, pos, with_labels=True, node_color='lightblue', 
+                node_size=500, font_size=10, font_weight='bold')
+        
+        # Desenhar os pesos das arestas
+        edge_labels = nx.get_edge_attributes(G, 'weight')
+        nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
+        
+        # Configurar e mostrar o plot
+        plt.title("Grafo Visualizado")
+        plt.axis('off')
+        plt.tight_layout()
+        plt.show()
 
 # Função principal para interação com o usuário
 def main():
@@ -534,6 +572,8 @@ def main():
                 print(grafo.fluxo_maximo())
             case 14:
                 grafo.fecho_transitivo()
+            case 15:
+                grafo.visualizar_grafo()
  
 if __name__ == '__main__':
     main()
