@@ -1,5 +1,5 @@
 # Grafos_Algoritmos
-Apresente a solução para vários problemas clássicos em grafos, vistos em sala de aula.
+Problemas propostos
 
 
 0. Verificar se um grafo é conexo. 
