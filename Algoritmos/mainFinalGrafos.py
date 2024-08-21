@@ -20,6 +20,8 @@ class Grafo:
     ######## Questões ############
 
     ### 0 - Conexo
+    ## Verifica a conectividade atráves de DFS (Caso todos os vértices)
+    ## Se todos os vértices forem visitados, então o grafo é conexo
     def conexo(self):
         visitados = set()
 
@@ -73,7 +75,8 @@ class Grafo:
 
         for v in range(self.vertices):
             if v not in visitados:
-                self._dfs(v, visitados)  # Usa a função _dfs para marcar todos os vértices na mesma componente
+                # Usa a função _dfs para marcar todos os vértices na mesma componente
+                self._dfs(v, visitados) 
                 quantidade += 1
 
         return quantidade
@@ -108,8 +111,8 @@ class Grafo:
 
         return quantidade_scc
     
-    ### 6 - Imprimir os vértices de articulação de um grafo não-orientado (priorizar a ordem lexicográfica dos vértices).
-    #ERRRRADOOOO 
+    ### 6 - Imprimir os vértices de articulação 
+    # de um grafo não-orientado (priorizar a ordem lexicográfica dos vértices).
     def imprimir_articulacoes(self): 
         if self.direcionado:
             return print(-1)
@@ -274,6 +277,7 @@ class Grafo:
         return -1
     
     ### 13 - Calcular o valor do fluxo máximo em um grafo direcionado.
+    ## Utiliza  o algoritmo de Edmonds-Karp
     def fluxo_maximo(self):
         if not self.direcionado:
             return -1
@@ -291,7 +295,6 @@ class Grafo:
             for v, peso, _ in self.adjacencias[u]:
                 capacidade[u][v] = peso
 
-        # Aplica o algoritmo de Edmonds-Karp
         fluxo_maximo = 0
         while True:
             # Encontra um caminho aumentante usando BFS
@@ -348,7 +351,8 @@ class Grafo:
     ############## Funções Auxiliares ###########
 
     def _adicionar_aresta(self, id_aresta, u, v, peso=1):
-        # Adiciona uma aresta entre os vértices u e v com um peso opcional e o identificador da aresta.
+        # Adiciona uma aresta entre os vértices u e v com um peso opcional 
+        # e o identificador da aresta.
         self.adjacencias[u].append((v, peso, id_aresta))
         if not self.direcionado:
             self.adjacencias[v].append((u, peso, id_aresta))
@@ -415,7 +419,11 @@ class Grafo:
         if diferenca_saidas_entradas == 0 and diferenca_entradas_saidas == 0:
             return 1
         return 0
-
+    
+    ## Função auxiliar da ciclo(), implementando a Busca em Profundidade (DFS) 
+    # para detecção de ciclos.
+    ## Marca os vértices visitados e em processamento, verificando se há revisita 
+    # a algum vértice.
     def _dfs_ciclo(self, v, visitados, em_processamento, pai):
         visitados.add(v)
         em_processamento.add(v)
@@ -497,7 +505,7 @@ class Grafo:
     def visualizar_grafo(self):
         G = nx.Graph() if not self.direcionado else nx.DiGraph()
         
-        # Adicionar nós
+        # Adicionar vértices
         G.add_nodes_from(range(self.vertices))
         
         # Adicionar arestas
@@ -526,20 +534,25 @@ class Grafo:
 # Função principal para interação com o usuário
 def main():
 
+    ## Pega as questões selecionadas
     questoes_selecionados = list(map(int, input().split()))
 
+    ## Pega a quantidade de vértices e a quantidade de arestas
     vertices_arestas = list(map(int, input().split()))
 
+    ## Pega se o grafo é direcionado ou não
     if input() == 'direcionado':
         direcionado = True
     else: 
         direcionado = False
 
+    ## Faz um looping recebendo o id_da_aresta vertice_v vertice_u peso
     grafo = Grafo(vertices_arestas[0], direcionado)
     for _ in range(vertices_arestas[1]):
         aresta = list(map(int, input().split()))
         grafo._adicionar_aresta(aresta[0], aresta[1], aresta[2], aresta[3])
 
+    ## Match com todas as questões digitadas
     for i in questoes_selecionados:
         match(i):
             case 0:
