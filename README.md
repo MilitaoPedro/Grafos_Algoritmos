@@ -28,10 +28,10 @@ Você deve imprimir o identificador das arestas. Caso o grafo seja desconexo, co
   0 é o vértice escolhido.
 
 
-##Entrada
-  Cada grafo G = (V,E) terá 1 ≤ |V| ≤ 300, e |V|-1 ≤ |E| ≤ 5 * |V|. Os pesos das arestas (ou arcos) estão distribuídos entre 1 e 100.
+## Entrada
+ - Cada grafo G = (V,E) terá 1 ≤ |V| ≤ 300, e |V|-1 ≤ |E| ≤ 5 * |V|. Os pesos das arestas (ou arcos) estão distribuídos entre 1 e 100.
 
 
 
-##Saída
-  Cada resultado em uma linha. Caso a funcionalidade testada não esteja disponível para o tipo do grafo ou o cálculo for indefinido, imprime-se "-1".
+## Saída
+ - Cada resultado em uma linha. Caso a funcionalidade testada não esteja disponível para o tipo do grafo ou o cálculo for indefinido, imprime-se "-1".
