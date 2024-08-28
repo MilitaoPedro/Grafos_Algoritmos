@@ -20,7 +20,7 @@ class Grafo:
     ######## Questões ############
 
     ### 0 - Conexo
-    ## Verifica a conectividade atráves de DFS (Caso todos os vértices)
+    ## Verifica a conectividade atráves de DFS
     ## Se todos os vértices forem visitados, então o grafo é conexo
     def conexo(self):
         visitados = set()
@@ -74,9 +74,11 @@ class Grafo:
         quantidade = 0
 
         for v in range(self.vertices):
+            # Se o vértice não foi visitado, é o início de uma nova componente conexa
             if v not in visitados:
                 # Usa a função _dfs para marcar todos os vértices na mesma componente
                 self._dfs(v, visitados) 
+                # Incrementa o contador de componentes
                 quantidade += 1
 
         return quantidade
@@ -117,24 +119,28 @@ class Grafo:
         if self.direcionado:
             return print(-1)
         
-        visitados = set()
-        desc = [-1] * self.vertices
-        low = [-1] * self.vertices
-        pai = [None] * self.vertices
-        articulacoes = set()
-        time = [0]
+        # Inicializa estruturas de dados para a DFS
+        visitados = set()  # Conjunto de vértices visitados
+        desc = [-1] * self.vertices  # Tempo de descoberta
+        low = [-1] * self.vertices  # Valor low
+        pai = [None] * self.vertices  # Pai na árvore DFS
+        articulacoes = set()  # Conjunto de vértices de articulação
+        time = [0]  # Tempo de descoberta global
 
+        # Itera sobre todos os vértices do grafo
         for v in range(self.vertices):
             if v not in visitados:
+                # Realiza DFS para encontrar vértices de articulação
                 self._dfs_articulacao(v, visitados, desc, low, pai, articulacoes, time)
 
+        # Ordena os vértices de articulação em ordem lexicográfica
         articulacoes_sorted = sorted(articulacoes)
         if len(articulacoes_sorted) == 0:
             return print('0 ')
         for vertice in articulacoes_sorted:
             print(vertice, end=' ')
         print('')
-    
+
     ### 7 - Calcular quantas arestas ponte possui um grafo não-orientado. 
     def calcula_pontes(self):
         if self.direcionado:
@@ -156,24 +162,28 @@ class Grafo:
     ### 8 - Imprimir a árvore em profundidade (priorizando a ordem lexicográfica dos vértices; 0 é a origem).
     def imprimir_arvore_profundidade(self):
         visitados = set()
+        # Lista para armazenar as arestas usadas na árvore de profundidade
         arestas_usadas = []
 
+        # Função interna para realizar DFS modificada
         def dfs_modificado(v):
             visitados.add(v)
-            # Ordena os vizinhos pelo identificador do vértice
+            # Ordena os vizinhos em ordem lexicográfica e itera sobre eles
             for vizinho, _, id_aresta in sorted(self.adjacencias[v], key=lambda x: x[0]):
                 if vizinho not in visitados:
+                    # Adiciona a aresta usada à lista
                     arestas_usadas.append(id_aresta)
+                    # Chama DFS recursivamente para o vizinho
                     dfs_modificado(vizinho)
 
         # Inicia a DFS a partir do vértice 0
         dfs_modificado(0)
 
-        # Imprime os identificadores das arestas na ordem em que foram usadas
+        # Ordena e imprime os identificadores das arestas na ordem em que foram usadas
         for id_aresta in sorted(arestas_usadas):
             print(f'{id_aresta} ', end='')
         print('')
-
+    
     ### 9 - Imprimir a árvore em largura (priorizando a ordem lexicográfica dos vértices; 0 é a origem).
     def imprimir_arvore_largura(self):
         if self.direcionado:
@@ -199,20 +209,29 @@ class Grafo:
         if self.direcionado:
             return -1
 
-        # Inicializa a AGM com 0
+        # Inicializa o valor total da Árvore Geradora Mínima (AGM)
         agm = 0
 
-        # Utiliza o algoritmo de Kruskal para encontrar a AGM
+        # Cria uma lista de todas as arestas do grafo
+        # Cada aresta é representada por uma tupla (peso, vértice_origem, vértice_destino)
+        # A lista é ordenada pelo peso das arestas (ordem crescente)
         arestas = sorted([(peso, u, v) for u in self.adjacencias for v, peso, _ in self.adjacencias[u]])
+
         visitados = set()
 
+        # Itera sobre as arestas ordenadas (algoritmo de Kruskal)
         for peso, u, v in arestas:
+            # Verifica se a aresta conecta componentes ainda não conectados
             if v not in visitados or u not in visitados:
+                # Adiciona os vértices ao conjunto de visitados
                 visitados.add(u)
                 visitados.add(v)
+                # Adiciona o peso da aresta ao valor total da AGM
                 agm += peso
 
-        # Verifica se o grafo é conexo
+        # Verifica se o grafo é conexo, sem a necessidade de chamar a função conexo()
+        # Se o número de vértices visitados for diferente do total de vértices,
+        # significa que o grafo não é conexo
         if len(visitados) != self.vertices:
             return -1
 
@@ -244,36 +263,42 @@ class Grafo:
             print(f'{empilhamento.pop()} ', end='')
         print('')
 
-    ### 12 - Valor do caminho mínimo entre dois vértices (para grafos não-orientados com pelo menos um peso diferente nas arestas).  
+    ### 12 - Valor do caminho mínimo entre dois vértices (para grafos não-orientados com pelo menos um peso diferente nas arestas).
+    # Algoritmo de Dijkstra  
     def caminho_minimo(self):
         if self.direcionado:
             return -1
 
+        # Inicializa o vértice de origem e destino
         origem = 0
         destino = self.vertices - 1
+        # Inicializa as distâncias como infinito, exceto para a origem
         distancias = {i: float('inf') for i in range(self.vertices)}
         distancias[origem] = 0
-        prioridade = [(0, origem)]  # (distância acumulada, vértice)
+        # Fila de prioridade para armazenar (distância acumulada, vértice)
+        prioridade = [(0, origem)]
 
         while prioridade:
+            # Remove o vértice com a menor distância acumulada
             distancia_atual, atual = heapq.heappop(prioridade)
 
             # Se já chegamos ao destino, retornamos a distância
             if atual == destino:
                 return distancia_atual
 
-            # Se a distância atual é maior do que a registrada, ignore
+            # Ignora se a distância atual é maior do que a registrada
             if distancia_atual > distancias[atual]:
                 continue
 
+            # Explora os vizinhos do vértice atual
             for vizinho, peso, _ in self.adjacencias[atual]:
                 distancia = distancia_atual + peso
 
+                # Se a nova distância for menor, atualiza e adiciona à fila
                 if distancia < distancias[vizinho]:
                     distancias[vizinho] = distancia
                     heapq.heappush(prioridade, (distancia, vizinho))
 
-        # Se o destino não for alcançável
         return -1
     
     ### 13 - Calcular o valor do fluxo máximo em um grafo direcionado.
@@ -332,21 +357,31 @@ class Grafo:
 
         return fluxo_maximo
 
-    ### 14 - Fecho transitivo para grafos direcionados.
+    ### 14 - Fecho transitivo para grafos direcionados (Modificado, para utiliza o algoritmo de Warshall).
     def fecho_transitivo(self):
         if not self.direcionado:
             return print(-1)
 
-        visitados = set()
-        # Inicia a DFS a partir do vértice 0
-        self._dfs(0, visitados)
+        # Inicializa a matriz de adjacência
+        fecho = [[0] * self.vertices for _ in range(self.vertices)]
 
-        # Retorna os vértices alcançáveis a partir do vértice 0, em ordem lexicográfica
-        visitados_sorted = sorted(visitados)
+        # Preenche a matriz de adjacência inicial
+        for u in range(self.vertices):
+            for v, _, _ in self.adjacencias[u]:
+                fecho[u][v] = 1
 
-        for v in visitados_sorted:
-            print(f'{v} ', end='')
-        print('')
+        # Aplica o algoritmo de Warshall
+        for k in range(self.vertices):
+            for i in range(self.vertices):
+                for j in range(self.vertices):
+                    fecho[i][j] = fecho[i][j] or (fecho[i][k] and fecho[k][j])
+
+        # Imprime o fecho transitivo
+        for i in range(self.vertices):
+            for j in range(self.vertices):
+                if fecho[i][j]:
+                    print(f'{i} -> {j}', end=' ')
+            print('')
 
     ############## Funções Auxiliares ###########
 
@@ -393,7 +428,11 @@ class Grafo:
         return 0
 
     def _euleriano_direcionado(self):
-        # Verifica se todos os vértices têm o mesmo grau de entrada e saída e se o grafo é fracamente conexo
+        # Verificar conectividade fraca utilizando a função conexo
+        if not self.conexo():
+            return 0
+        
+        # Verifica se todos os vértices têm o mesmo grau de entrada e saída
         graus_entrada = {i: 0 for i in range(self.vertices)}
         graus_saida = {i: 0 for i in range(self.vertices)}
 
@@ -411,10 +450,6 @@ class Grafo:
                 diferenca_entradas_saidas += 1
             elif graus_entrada[v] != graus_saida[v]:
                 return 0
-
-        # Verificar conectividade fraca utilizando a função conexo
-        if not self.conexo():
-            return 0
 
         if diferenca_saidas_entradas == 0 and diferenca_entradas_saidas == 0:
             return 1
@@ -448,26 +483,31 @@ class Grafo:
         return grafo_transposto
 
     def _dfs_articulacao(self, v, visitados, desc, low, pai, articulacoes, time):
+        # Marca o vértice como visitado
         visitados.add(v)
+        # Define o tempo de descoberta e o valor low
         desc[v] = low[v] = time[0]
         time[0] += 1
-        filhos = 0
+        filhos = 0  # Contador de filhos na árvore DFS
         
-        for vizinho, _ , _ in self.adjacencias[v]:  # Considera o peso da aresta, mas não o utiliza aqui
+        # Itera sobre todos os vizinhos do vértice
+        for vizinho, _, _ in self.adjacencias[v]:  # Considera o peso da aresta, mas não o utiliza aqui
             if vizinho not in visitados:
+                # Define o pai do vizinho e incrementa o contador de filhos
                 pai[vizinho] = v
                 filhos += 1
+                # Chama recursivamente a DFS
                 self._dfs_articulacao(vizinho, visitados, desc, low, pai, articulacoes, time)
                 
-                # Verifica e atualiza o valor de low
+                # Atualiza o valor low do vértice
                 low[v] = min(low[v], low[vizinho])
                 
-                # Condição para o vértice de articulação
+                # Verifica condições para o vértice de articulação
                 if pai[v] is None and filhos > 1:
                     articulacoes.add(v)
                 if pai[v] is not None and low[vizinho] >= desc[v]:
                     articulacoes.add(v)
-            elif vizinho != pai[v]:  # Atualização do valor de low
+            elif vizinho != pai[v]:  # Atualização do valor low para arestas de retorno
                 low[v] = min(low[v], desc[vizinho])
 
     def _dfs_pontes(self, u, visitados, disc, low, pai, pontes, tempo):
